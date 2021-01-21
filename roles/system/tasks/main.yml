@@ -1,0 +1,19 @@
+---
+# tasks file for system
+
+- name: Import task to install packages
+  ansible.builtin.import_tasks: packages.yml
+
+- name: Create and configure users
+  ansible.builtin.import_tasks: users.yml
+
+- name: Secure SSH settings
+  vars:
+    ssh_allow_users: "{{ user_account['name'] }}"
+    sftp_enabled: true
+  ansible.builtin.import_role:
+    name: devsec.hardening.ssh_hardening
+
+- name: Secure SSH settings
+  ansible.builtin.import_role:
+    name: devsec.hardening.os_hardening

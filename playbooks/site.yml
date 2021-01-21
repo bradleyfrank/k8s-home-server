@@ -1,0 +1,7 @@
+---
+
+- name: Bootstrap
+  hosts: all
+  roles:
+    - system
+    - k0s
