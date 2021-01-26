@@ -68,3 +68,19 @@ packages:
   - zsh
   - zsh-autosuggestions
   - zsh-syntax-highlighting
+
+mount_nfs_shares: true
+
+nfs_mounts:
+  - name: Plex Media
+    server_path: 192.168.1.20:/volume1/Media
+    mount_point: /nfs/Media
+    systemd_filename: nfs-Media.mount
+  - name: Nextcloud
+    server_path: 192.168.1.20:/volume1/Nextcloud
+    mount_point: /nfs/Nextcloud
+    systemd_filename: nfs-Nextcloud.mount
+  - name: Linux ISOs
+    server_path: 192.168.1.20:/volume1/Software
+    mount_point: /nfs/Software
+    systemd_filename: nfs-Software.mount

@@ -1,0 +1,17 @@
+---
+
+helm_charts:
+  - name: plex
+    chart: k8s-at-home/plex
+    repo_name: k8s-at-home
+    repo_url: https://k8s-at-home.com/charts/
+
+  - name: code-server
+    chart: nicholaswilde/code-server
+    repo_name: nicholaswilde
+    repo_url: https://nicholaswilde.github.io/helm-charts/
+
+  - name: nextcloud
+    chart: nextcloud/nextcloud
+    repo_name: nextcloud
+    repo_url: https://nextcloud.github.io/helm/

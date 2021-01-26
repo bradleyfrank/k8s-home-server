@@ -7,6 +7,10 @@
 - name: Create and configure users
   ansible.builtin.import_tasks: users.yml
 
+- name: Setup NFS mounts
+  ansible.builtin.import_tasks: nfs.yml
+  when: mount_nfs_shares
+
 - name: Secure SSH settings
   vars:
     ssh_allow_users: "{{ user_account['name'] }}"
@@ -14,6 +18,6 @@
   ansible.builtin.import_role:
     name: devsec.hardening.ssh_hardening
 
-- name: Secure SSH settings
+- name: Secure OS settings
   ansible.builtin.import_role:
     name: devsec.hardening.os_hardening
