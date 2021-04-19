@@ -1,0 +1,17 @@
+---
+
+- name: Helm
+  hosts: all
+  tasks:
+    - name: Add helm repo
+      kubernetes.core.helm_repository:
+        name: "{{ item.repo_name }}"
+        repo_url: "{{ item.repo_url }}"
+      loop: "{{ helm_charts }}"
+
+    - name: Install Helm chart
+      kubernetes.core.helm:
+        name: "{{ item.name }}"
+        namespace: "{{ item.name }}"
+        chart_ref: "{{ item.chart }}"
+      loop: "{{ helm_charts }}"

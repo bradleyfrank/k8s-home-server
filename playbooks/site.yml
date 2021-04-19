@@ -2,6 +2,21 @@
 
 - name: Bootstrap
   hosts: all
-  roles:
-    - system
-    - k0s
+
+- name: Install packages
+  ansible.builtin.import_playbook: packages.yml
+
+- name: Setup users
+  ansible.builtin.import_playbook: users.yml
+
+- name: Secure server
+  ansible.builtin.import_playbook: security.yml
+
+- name: Mount NFS storage
+  ansible.builtin.import_playbook: nfs.yml
+
+- name: Configure k0s
+  ansible.builtin.import_playbook: k0s.yml
+
+- name: Install Istio
+  ansible.builtin.import_playbook: istio.yml

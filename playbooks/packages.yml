@@ -1,0 +1,30 @@
+---
+
+- name: Packages
+  hosts: all
+  tasks:
+    - name: Install gpg keys
+      ansible.builtin.apt_key:
+        url: "{{ item.key | default(omit) }}"
+        keyring: "{{ item.keyring | default(omit) }}"
+        id: "{{ item.id | default(omit) }}"
+        keyserver: "{{ item.keyserver | default(omit) }}"
+      loop: "{{ repos }}"
+
+    - name: Install repositories
+      ansible.builtin.apt_repository:
+        repo: "{{ item.repo }}"
+        filename: "{{ item.name }}"
+      loop: "{{ repos }}"
+
+    - name: Install system packages
+      ansible.builtin.apt:
+        name: "{{ apt_packages }}"
+        state: present
+        install_recommends: true
+        update_cache: true
+
+    - name: Install pip packages
+      ansible.builtin.pip:
+        name: "{{ pip_packages }}"
+        state: present

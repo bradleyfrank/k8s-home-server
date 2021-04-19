@@ -1,0 +1,21 @@
+---
+
+- name: Istio
+  hosts: all
+  tasks:
+    - name: Download Istio
+      ansible.builtin.get_url:
+        url: "{{ istio_tgz_url }}"
+        dest: "/tmp/{{ istio_tgz }}"
+        mode: 0644
+
+    - name: Extract Istio archive
+      ansible.builtin.unarchive:
+        remote_src: true
+        src: "/tmp/{{ istio_tgz }}"
+        dest: /usr/local/bin
+        extra_opts: ["--strip=2", "--wildcards", "*/bin/istioctl"]
+        creates: /usr/local/bin/istioctl
+
+    - name: Install Istio
+      ansible.builtin.command: istioctl install --skip-confirmation

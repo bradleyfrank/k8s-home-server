@@ -1,0 +1,62 @@
+---
+
+- name: k0s
+  hosts: all
+  tasks:
+    - name: Allow ports through firewall
+      community.general.ufw:
+        port: "{{ item.port | default(omit) }}"
+        rule: "{{ item.rule | default(omit) }}"
+        direction: "{{ item.direction | default(omit) }}"
+        interface: "{{ item.interface | default(omit) }}"
+        default: "{{ item.default | default(omit) }}"
+      loop: "{{ k0s_ufw_rules }}"
+
+    - name: Download k0s
+      ansible.builtin.get_url:
+        url: "{{ k0s_url }}"
+        dest: /usr/local/bin/k0s
+        mode: 0755
+
+    - name: Install single node controller
+      ansible.builtin.command:
+        cmd: k0s install controller --single
+        creates: /etc/systemd/system/k0scontroller.service
+
+    - name: Start k0s service
+      ansible.builtin.systemd:
+        name: k0scontroller
+        state: started
+        enabled: true
+
+    - name: Wait for kube config to be generated
+      ansible.builtin.wait_for:
+        path: /var/lib/k0s/pki/admin.conf
+        state: present
+
+    - name: Create .kube directory for root
+      ansible.builtin.file:
+        path: "/root/.kube"
+        state: directory
+        mode: 0755
+
+    - name: Create kube config
+      ansible.builtin.copy:
+        remote_src: true
+        src: /var/lib/k0s/pki/admin.conf
+        dest: /root/.kube/config
+        mode: 0755
+
+    - name: Wait for k0s node to come up
+      kubernetes.core.k8s_info:
+        kind: Pod
+        wait: true
+        label_selectors:
+          - k8s-app=kube-router
+          - k8s-app=kube-proxy
+          - k8s-app=kube-dns
+          - k8s-app=metrics-server
+        namespace: kube-system
+        kubeconfig: /root/.kube/config
+        wait_sleep: 5
+        wait_timeout: 150

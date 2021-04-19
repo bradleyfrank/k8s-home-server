@@ -1,0 +1,41 @@
+---
+
+- name: NFS
+  hosts: all
+  tasks:
+    - name: Create NFS mount points
+      ansible.builtin.file:
+        path: "{{ item.mount_point }}"
+        state: directory
+        mode: 0755
+      loop: "{{ nfs_mounts }}"
+
+    - name: Install systemd mounts
+      ansible.builtin.blockinfile:
+        path: "/etc/systemd/system/{{ item.systemd_filename }}"
+        create: true
+        mode: 0644
+        block: |
+          [Unit]
+          Description={{ item.name }}
+
+          [Mount]
+          What={{ item.server_path }}
+          Where={{ item.mount_point }}
+          Options=auto
+          Type=nfs
+
+          [Install]
+          WantedBy=multi-user.target
+      loop: "{{ nfs_mounts }}"
+
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: true
+
+    - name: Mount NFS shares
+      ansible.builtin.systemd:
+        name: "{{ item.systemd_filename }}"
+        state: started
+        enabled: true
+      loop: "{{ nfs_mounts }}"

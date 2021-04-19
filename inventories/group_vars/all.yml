@@ -1,0 +1,133 @@
+---
+
+gist_user_url: https://gist.githubusercontent.com/bradleyfrank
+gist_dotfiles: afe2fd77032ef9a08d814a87d4ac2251/raw/43447df2c0a2e0606f2e4497f840c433aa0c6114
+gist_dotfiles_url: "{{ gist_user_url }}/{{ gist_dotfiles }}"
+
+user_account:
+  name: bfrank
+  shell: /usr/bin/zsh
+  groups: ['sudo']
+  key: ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFStPMEL6J3I60LhF5HpzGdfv3eJymi3UKVDWPq7VOjP bfrank@francopuccini.casa
+  dotfiles_url: https://github.com/bradleyfrank/ansible.git
+
+root_dotfiles:
+  - name: bash_profile
+    url: "{{ gist_dotfiles_url }}/root.bash_profile"
+    dest: /root/.bash_profile
+  - name: bashrc
+    url: "{{ gist_dotfiles_url }}/root.bashrc"
+    dest: /root/.bashrc
+
+system_ufw_rules:
+  - name: allow_ssh
+    port: ssh
+    rule: allow
+  - name: allow_http
+    port: http
+    rule: allow
+  - name: allow_https
+    port: https
+    rule: allow
+
+repos:
+  - name: kubernetes
+    repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+    key: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+  - name: helm
+    repo: deb https://baltocdn.com/helm/stable/debian/ all main
+    key: https://baltocdn.com/helm/signing.asc
+
+apt_packages:
+  - apt-file
+  - apt-transport-https  # for k8s
+  - bat
+  - dictd
+  - figlet
+  - fzf
+  - glances
+  - gnupg2  # for k8s
+  - helm
+  - htop
+  - iftop
+  - jq
+  - kubectl
+  - libmp4-info-perl
+  - libvirt-clients
+  - most
+  - mtr
+  - ncdu
+  - neofetch
+  - nfs-common
+  - nmap
+  - p7zip-*
+  - python3
+  - python3-dev
+  - python3-pip
+  - remmina
+  - reptyr
+  - shellcheck
+  - ssh
+  - stow
+  - strace
+  - tlp
+  - tmux
+  - toilet
+  - trash-cli
+  - tree
+  - vim
+  - wget
+  - xsel
+  - xz-utils
+  - zsh
+  - zsh-autosuggestions
+  - zsh-syntax-highlighting
+
+pip_packages:
+  - openshift  # for Ansible
+  - ansible  # for dotfiles
+
+k0s_version: 0.13.1
+k0s_url: "https://github.com/k0sproject/k0s/releases/download/v{{ k0s_version }}/k0s-v{{ k0s_version }}-amd64"
+
+k0s_ufw_rules:
+  - name: allow_k8s_api
+    port: "6443"
+    rule: allow
+  - name: allow_pod-to-pod
+    rule: allow
+    direction: in
+    interface: kube-bridge
+  - name: allow_pod-to-internet
+    rule: allow
+    direction: out
+    interface: kube-bridge
+  - name: default_routed
+    default: allow
+    direction: routed
+
+istio_version: 1.9.2
+istio_tgz: "istio-{{ istio_version }}-linux-amd64.tar.gz"
+istio_tgz_url: "https://github.com/istio/istio/releases/download/{{ istio_version }}/{{ istio_tgz }}"
+
+helm_charts:
+  - name: metallb
+    chart: bitnami/metallb
+    repo_name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami
+  - name: plex
+    chart: k8s-at-home/plex
+    repo_name: k8s-at-home
+    repo_url: https://k8s-at-home.com/charts/
+  - name: code-server
+    chart: nicholaswilde/code-server
+    repo_name: nicholaswilde
+    repo_url: https://nicholaswilde.github.io/helm-charts/
+  - name: nextcloud
+    chart: nextcloud/nextcloud
+    repo_name: nextcloud
+    repo_url: https://nextcloud.github.io/helm/
+  - name: redis
+    chart: bitnami/redis
+    repo_name: bitnami
+    repo_url: https://charts.bitnami.com/bitnami

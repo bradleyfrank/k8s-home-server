@@ -1,4 +1,0 @@
----
-
-service_file: /etc/k0s/k0s.yaml
-local_kubectl_config: ~/.kube/k0s

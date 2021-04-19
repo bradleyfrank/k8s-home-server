@@ -1,0 +1,29 @@
+---
+
+- name: Security
+  hosts: all
+  tasks:
+    - name: Allow ports through firewall
+      community.general.ufw:
+        port: "{{ item.port | default(omit) }}"
+        rule: "{{ item.rule | default(omit) }}"
+        direction: "{{ item.direction | default(omit) }}"
+        interface: "{{ item.interface | default(omit) }}"
+        default: "{{ item.default | default(omit) }}"
+      loop: "{{ system_ufw_rules }}"
+
+    - name: Enable UFW
+      community.general.ufw:
+        state: enabled
+        logging: "on"
+
+    - name: Secure SSH settings
+      vars:
+        ssh_allow_users: "{{ user_account['name'] }} {{ ansible_user }}"
+        sftp_enabled: true
+      ansible.builtin.import_role:
+        name: devsec.hardening.ssh_hardening
+
+    - name: Secure OS settings
+      ansible.builtin.import_role:
+        name: devsec.hardening.os_hardening

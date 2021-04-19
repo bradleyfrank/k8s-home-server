@@ -1,0 +1,41 @@
+---
+
+- name: Users
+  hosts: all
+  tasks:
+    - name: Create local user
+      ansible.builtin.user:
+        name: "{{ user_account['name'] }}"
+        shell: "{{ user_account['shell'] }}"
+        groups: "{{ user_account['groups'] }}"
+
+    - name: Add ssh key to authorized_keys
+      ansible.posix.authorized_key:
+        user: "{{ user_account['name'] }}"
+        key: "{{ user_account['key'] }}"
+
+    - name: Create dotfiles directory
+      ansible.builtin.file:
+        path: "/home/{{ user_account['name'] }}/.dotfiles"
+        state: directory
+        mode: 0755
+
+    - name: Clone dotfiles repo
+      ansible.builtin.git:
+        repo: "{{ user_account['dotfiles_url'] }}"
+        dest: "/home/{{ user_account['name'] }}/.dotfiles"
+        depth: 1
+
+    - name: Fix dotfiles directory permissions
+      ansible.builtin.file:
+        path: "/home/{{ user_account['name'] }}/.dotfiles"
+        owner: "{{ user_account['name'] }}"
+        group: "{{ user_account['name'] }}"
+        recurse: true
+
+    - name: Download root dotfiles
+      ansible.builtin.get_url:
+        url: "{{ item.url }}"
+        dest: "{{ item.dest }}"
+        mode: 0644
+      loop: "{{ root_dotfiles }}"

@@ -1,0 +1,11 @@
+---
+
+nfs_mounts:
+  - name: Media
+    server_path: 192.168.1.30:/mnt/nfs-data/media
+    mount_point: /nfs/Media
+    systemd_filename: nfs-Media.mount
+  - name: Nextcloud
+    server_path: 192.168.1.30:/mnt/nfs-data/nextcloud
+    mount_point: /nfs/Nextcloud
+    systemd_filename: nfs-Nextcloud.mount
